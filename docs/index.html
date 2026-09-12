@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Professional Events Tracker</title>
+  <meta name="description" content="School and Bay Area events for the Berkeley Haas EWMBA cohort, with who's going.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="config.js"></script>
+  <script>
+    // Larken is licensed through Adobe Fonts. With a kit ID in config.js it loads; otherwise headings use Barlow.
+    (function () {
+      var kit = window.WW_CONFIG && window.WW_CONFIG.adobeFontsKitId;
+      if (kit && /^[a-z0-9]+$/i.test(kit)) {
+        var l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = 'https://use.typekit.net/' + kit + '.css';
+        document.head.appendChild(l);
+      }
+    })();
+  </script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand">
+      <p class="wordmark">Professional Events Tracker</p>
+      <p class="tagline" id="tagline">Berkeley Haas EWMBA &middot; school and Bay Area events</p>
+    </div>
+    <p class="disclaimer">Not affiliated with or sponsored by UC Berkeley. An independent, student-run, open-source project.</p>
+    <div class="mast-right">
+      <p class="updated" id="updated"></p>
+      <button type="button" class="report-btn" id="report-btn" hidden>
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3 2 21h20L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="18" r="1.2" fill="currentColor"/></svg>
+        <span>Report a bug</span>
+      </button>
+      <div class="usermenu" id="usermenu" hidden>
+        <button type="button" class="user-btn" id="user-btn" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="user-pop" id="user-pop" hidden>
+          <p class="user-email" id="user-email"></p>
+          <button type="button" id="rename-btn">Change display name</button>
+          <button type="button" id="signout-btn">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="demo-banner" id="demo-banner" hidden>
+    <strong>Preview with example events.</strong>
+    The names, events, and RSVPs below are examples. Add your Supabase details to <code>config.js</code> to switch to the live cohort feed.
+  </div>
+
+  <!-- Signed-out view -->
+  <main class="signin" id="signin" hidden>
+    <section class="signin-copy">
+      <h1>Everything worth showing up for, <em>after work</em>.</h1>
+      <p>One calendar for the EWMBA cohort: Bear Necessities, Haas newsletters, club announcements, and Bay Area events MBAs actually go to. See who's going, then add it to your calendar.</p>
+    </section>
+    <section class="signin-box" aria-labelledby="signin-h">
+      <h2 id="signin-h">Sign in with your Berkeley account</h2>
+      <button type="button" class="btn-primary" id="google-btn">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21.35 11.1H12v2.98h5.35c-.23 1.4-1.63 4.1-5.35 4.1-3.22 0-5.85-2.67-5.85-5.96S8.78 6.26 12 6.26c1.84 0 3.07.78 3.77 1.45l2.57-2.47C16.7 3.7 14.56 2.75 12 2.75 6.9 2.75 2.77 6.9 2.77 12s4.13 9.25 9.23 9.25c5.33 0 8.86-3.74 8.86-9.02 0-.6-.07-1.07-.15-1.53z"/></svg>
+        Continue with bMail
+      </button>
+      <div class="or"><span>or get a sign-in link</span></div>
+      <form id="email-form" class="email-form">
+        <label for="email-input">Berkeley email</label>
+        <div class="email-row">
+          <input id="email-input" type="email" autocomplete="email" placeholder="you@berkeley.edu" required>
+          <button type="submit" class="btn-quiet">Email me a link</button>
+        </div>
+      </form>
+      <p class="signin-status" id="signin-status" role="status"></p>
+      <p class="fineprint">Only @berkeley.edu accounts can see events. Your name appears only on events you mark as going.</p>
+    </section>
+  </main>
+
+  <!-- Signed-in view -->
+  <div class="shell" id="app" hidden>
+    <aside class="rail" id="rail" aria-label="Filters">
+      <div class="rail-head">
+        <h2>Filters</h2>
+        <button type="button" class="link-btn" id="clear-btn">Clear all</button>
+        <button type="button" class="rail-close" id="rail-close" aria-label="Close filters">&times;</button>
+      </div>
+
+      <label class="search">
+        <span class="sr">Search events</span>
+        <input type="search" id="q" placeholder="Search title, host, place&hellip;">
+      </label>
+
+      <fieldset class="group">
+        <legend>Date range</legend>
+        <div class="when" id="when"></div>
+        <div class="custom-range" id="custom-range" hidden>
+          <label>From <input type="date" id="from"></label>
+          <label>To <input type="date" id="to"></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend>Quick filters</legend>
+        <div class="toggles" id="toggles"></div>
+      </fieldset>
+
+      <div id="facets"></div>
+    </aside>
+    <div class="scrim" id="scrim" hidden></div>
+
+    <main class="main" id="main">
+      <div class="toolbar">
+        <button type="button" class="btn-quiet filters-btn" id="filters-btn">Filters <span id="filters-n"></span></button>
+        <p class="result-line" id="result-line" aria-live="polite"></p>
+        <div class="tool-actions">
+          <label class="sort">Sort
+            <select id="sort">
+              <option value="date">By date</option>
+              <option value="popular">Most going</option>
+            </select>
+          </label>
+          <button type="button" class="btn-quiet" id="export-btn" title="Download every event in this view as one calendar file">Export .ics</button>
+        </div>
+      </div>
+      <div class="active-chips" id="active-chips"></div>
+
+      <section class="fortnight" aria-label="Next 14 days">
+        <div class="fortnight-grid" id="fortnight"></div>
+      </section>
+
+      <div class="agenda" id="agenda"></div>
+    </main>
+  </div>
+
+  <dialog id="rename-dlg">
+    <form method="dialog" id="rename-form">
+      <h2>Your display name</h2>
+      <p>This is how cohort mates see you on events you're going to.</p>
+      <input id="rename-input" maxlength="40" required>
+      <div class="dlg-actions">
+        <button value="cancel" type="button" class="btn-quiet" id="rename-cancel">Cancel</button>
+        <button value="save" class="btn-primary">Save name</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="report-dlg" aria-labelledby="report-h">
+    <form id="report-form" novalidate>
+      <h2 id="report-h">Report a problem</h2>
+      <fieldset class="report-kinds">
+        <legend class="sr">What kind of problem?</legend>
+        <label><input type="radio" name="kind" value="bug" checked> Something’s broken</label>
+        <label><input type="radio" name="kind" value="event"> Event info is wrong</label>
+        <label><input type="radio" name="kind" value="idea"> Suggestion</label>
+      </fieldset>
+      <p class="report-event" id="report-event" hidden></p>
+      <label class="report-label" for="report-msg">What happened?</label>
+      <textarea id="report-msg" rows="5" maxlength="2000" placeholder="What you did, what you expected, and what you saw instead. For event info: what's wrong and where you saw the right details."></textarea>
+      <p class="fineprint">Your email, browser, screen size, and current filters are sent with the report so it can be reproduced. Only the site maintainer sees reports.</p>
+      <p class="report-status" id="report-status" role="status"></p>
+      <div class="dlg-actions">
+        <button type="button" class="btn-quiet" id="report-cancel">Cancel</button>
+        <button type="submit" class="btn-primary" id="report-send">Send report</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="site-footer">
+    <p><strong>Independent student project.</strong> Professional Events Tracker is an open-source, student-run project built for UC Berkeley Haas EWMBA students. It is not affiliated with, endorsed by, or sponsored by the University of California, Berkeley or the Haas School of Business, and it is not an official university website or tool.</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

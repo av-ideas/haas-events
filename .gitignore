@@ -1,0 +1,5 @@
+# Secrets and school data stay on this machine; the public repo only holds the site shell.
+refresh/.env
+refresh/events.json
+refresh/logs/
+refresh/sources.local.md
