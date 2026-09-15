@@ -18,6 +18,7 @@
     newsletter: 'Haas newsletters',
     slack: 'Slack',
     'campus-groups': 'Haas Campus Groups',
+    'haas-alumni': 'Haas Alumni',
     'bay-area': 'Bay Area public',
   };
   const CATEGORIES = {

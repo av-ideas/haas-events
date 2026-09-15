@@ -26,6 +26,7 @@
   --src-slack: #7b3a86;
   --src-bay: #0c7a68;
   --src-cg: #b0344a;
+  --src-alum: #5b4bc4;
 
   --brand: "Larken", "larken", "Barlow", "Segoe UI", system-ui, sans-serif;
   --display: "Barlow", "Segoe UI", system-ui, sans-serif;
@@ -57,6 +58,7 @@
     --src-slack: #d59ae0;
     --src-bay: #4fd1b6;
     --src-cg: #ff8fa3;
+    --src-alum: #b3a8ff;
     color-scheme: dark;
   }
 }
@@ -82,6 +84,7 @@
   --src-slack: #d59ae0;
   --src-bay: #4fd1b6;
   --src-cg: #ff8fa3;
+  --src-alum: #b3a8ff;
   color-scheme: dark;
 }
 
@@ -253,6 +256,7 @@ h1, h2, h3 { text-wrap: balance; margin: 0; }
 .src-slack { --src: var(--src-slack); }
 .src-bay-area { --src: var(--src-bay); }
 .src-campus-groups { --src: var(--src-cg); }
+.src-haas-alumni { --src: var(--src-alum); }
 .opt .sw[class*="src-"] { background: var(--src); }
 
 /* ---------- Toolbar ---------- */

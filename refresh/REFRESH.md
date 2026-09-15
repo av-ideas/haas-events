@@ -67,6 +67,24 @@ consulting club sessions, alumni mixers, affinity-club socials) and gives EW Wir
 - `source`: `campus-groups`; `source_detail`: the hosting club if shown, else "Haas Campus Groups".
 - Audience: `haas` unless the title or page says EWMBA (`ewmba`) or full-time MBA only. **Skip FTMBA-only events**
   (for example "FTMBA Alumni Mixer") since this feed is for the EWMBA cohort.
+## 1c. Haas Alumni events (public calendar API)
+Fetch `https://haas.berkeley.edu/wp-json/tribe/events/v1/events?categories=dar&per_page=50&start_date=<today YYYY-MM-DD>`
+(JSON; if it fails, use the iCal feed `https://haas.berkeley.edu/?post_type=tribe_events&ical=1&eventDisplay=list&tribe_events_cat=dar`).
+Each event has `title` (HTML entities: decode them), `start_date`/`end_date` (Pacific local time), `all_day`,
+`venue` (name, address, city), `categories` (slugs), `cost`, and `url` (the haas.berkeley.edu event page).
+The listing covers every chapter nationwide, so filter hard:
+- **Bay Area only**: keep a venue in San Francisco, the East Bay (Berkeley, Oakland, Emeryville, Alameda, Walnut
+  Creek, Moraga, etc.), the Peninsula, or the South Bay, plus virtual events. Drop other chapters (San Diego,
+  New York, Sacramento, Santa Barbara, ...).
+- **Keep** professional networking, mixers and happy hours, speaker panels, industry talks, and events in the
+  `student-almumni-events` category (built for students and alumni together).
+- **Skip** events limited to another program (e.g. "FTMBA Alumni ..."), family or recreation outings (zoo trips,
+  hikes), and reunions.
+- WebFetch each kept event's page to confirm students may attend and to find the registration link. Use the
+  registration link as `url` when there is one, else the haas.berkeley.edu event page (it has the register button).
+  If the page says alumni only, drop the event.
+- `source`: `haas-alumni`; `source_detail`: the chapter or host (e.g. "Silicon Valley Alumni"); `audience`: `haas`;
+  add the tag `"Alumni event"`. Category is usually `networking` or `speaker`.
 ## 2. Slack (optional: currently unavailable)
 The Haas Slack workspace blocks the Slack connector, so **skip this step** unless a Slack connector is available
 in this session. Don't try to reach Slack another way (browser, exports); the workspace admins chose to restrict
@@ -134,7 +152,7 @@ If a newsletter item mixes both, keep only the part students choose to attend.
 }
 ```
 Allowed values (the site's filters depend on these exact strings):
-- `source`: `bear-necessities` | `newsletter` (any other Haas/Berkeley email) | `campus-groups` | `slack` | `bay-area` (public web)
+- `source`: `bear-necessities` | `newsletter` (any other Haas/Berkeley email) | `campus-groups` | `haas-alumni` | `slack` | `bay-area` (public web)
 - `category`: `academic` | `career` | `club` | `speaker` | `networking` | `social` | `startup` | `conference` |
   `community` | `wellness` | `admin` (application deadlines for student opportunities only; never class or logistics items)
 - `audience`: `ewmba` | `haas` (all Haas programs) | `berkeley` (campus-wide) | `public`

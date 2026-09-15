@@ -24,7 +24,7 @@ create table if not exists public.events (
   format        text,                      -- in-person | virtual | hybrid
   description   text,
   url           text,
-  source        text not null,             -- bear-necessities | newsletter | campus-groups | slack | bay-area
+  source        text not null,             -- bear-necessities | newsletter | campus-groups | haas-alumni | slack | bay-area
   source_detail text,                      -- e.g. "EWMBA Weekly, Sep 8" or "#ewmba-2027"
   category      text,                      -- see docs/app.js CATEGORIES
   audience      text,                      -- ewmba | haas | berkeley | public
