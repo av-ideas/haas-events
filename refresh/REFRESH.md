@@ -21,6 +21,8 @@ Search the last **10 days** (on the first-ever run, 30 days). Always add `-in:se
 - `from:(ewmba_office@haas.berkeley.edu OR lists.haas.berkeley.edu OR entrepreneurship@haas.berkeley.edu) newer_than:10d -in:sent`
 - `from:(sacommunications@berkeley.edu OR graddean@berkeley.edu OR recwell@berkeley.edu) newer_than:10d`: campus
   newsletters. Only pick events relevant to grad or professional students.
+- `(trek OR "site visit" OR "company visit" OR "office visit" OR tour OR "career fair" OR "info session" OR "coffee chat" OR recruiting OR hiring OR "now hiring") newer_than:10d -in:sent`:
+  hiring events and industry tours (high priority, see 3b).
 - `(RSVP OR register OR "join us") newer_than:10d -in:sent`: catches club and student-government announcements
   sent to class lists (often BCC'd, so the To: line may be the sender).
 Use `get_thread` with `messageFormat: PLAIN_TEXT`. Newsletters often bundle 10+ events.
@@ -60,9 +62,9 @@ consulting club sessions, alumni mixers, affinity-club socials) and gives EW Wir
 - For events you don't already have from email, WebFetch the RSVP page for location, end time, description, and cost.
   If the page requires a login and hides those details, keep the event only if the title makes the topic clear, and
   set `location` to what the feed shows (or "See RSVP page").
-- Apply the section 3b rules. Skip religious services, office-selection webinars that are recruiting logistics,
-  info sessions for trips, and anything that reads as a class or program requirement. Keep speaker series, career and
-  industry sessions, club socials, and alumni mixers.
+- Apply the section 3b rules. Skip religious services and anything that reads as a class or program requirement.
+  Keep speaker series, hiring and recruiting sessions, treks and trek info sessions, career and industry sessions,
+  club socials, and alumni mixers.
 - If the same event also came from email, keep one entry (merge details; prefer the email's source label).
 - `source`: `campus-groups`; `source_detail`: the hosting club if shown, else "Haas Campus Groups".
 - Audience: `haas` unless the title or page says EWMBA (`ewmba`) or full-time MBA only. **Skip FTMBA-only events**
@@ -82,7 +84,10 @@ The listing covers every chapter nationwide, so filter hard:
   hikes), and reunions.
 - WebFetch each kept event's page to confirm students may attend and to find the registration link. Use the
   registration link as `url` when there is one, else the haas.berkeley.edu event page (it has the register button).
-  If the page says alumni only, drop the event.
+  **Check that the registration link is for the same event** (open it or read its URL/title); these pages sometimes
+  link the wrong event. If it doesn't match, use the haas.berkeley.edu event page.
+- If the page says alumni only, drop the event. If it doesn't mention students either way, keep it and add the tag
+  `"Check student eligibility"` plus a note in the description.
 - `source`: `haas-alumni`; `source_detail`: the chapter or host (e.g. "Silicon Valley Alumni"); `audience`: `haas`;
   add the tag `"Alumni event"`. Category is usually `networking` or `speaker`.
 ## 2. Slack (optional: currently unavailable)
@@ -103,7 +108,9 @@ South Bay) that fit a Haas MBA audience. **Only these topics qualify:**
 - Large public industry events run by or centered on key regional employers (e.g. Dreamforce, major bank or big-tech
   conferences, TechCrunch Disrupt)
 
-Do **not** include public sports, festivals, fairs, general-interest culture, wellness, or hobby events. Good places
+Also look for public **career fairs and recruiting events** for MBAs or experienced professionals, and public
+**company tours or open houses** at Bay Area employers. Do **not** include public sports, festivals, fairs
+(other than career fairs), general-interest culture, wellness, or hobby events. Good places
 to look: lu.ma (SF/Bay Area discovery pages), Eventbrite, Meetup, conference sites, SF Fed / bank / VC firm event pages,
 CFA Society San Francisco, Berkeley SkyDeck. Prefer weeknight-evening and weekend events. Aim for 8-20 high-quality
 picks. Skip spam, MLM, and paid "masterclass" funnels. Only include an event when its date and place are confirmed on
@@ -113,6 +120,13 @@ the organizer's own page or two independent listings.
 An event is something MBA students **choose to attend**: speaker series, career workshops, club events, socials,
 conferences, networking, community events, and application deadlines for student opportunities (fellowships, board
 programs). Email-sourced events like these are relevant by default.
+
+**High priority, look for these explicitly on every source:**
+- **Hiring and recruiting** (`category: hiring`): employer info sessions, career fairs, coffee chats and office hours
+  with firms, startup or employer matching mixers, recruiting prep tied to a hiring cycle (e.g. consulting office
+  selection), and application deadlines for jobs or internships posted to the class.
+- **Industry tours and treks** (`category: tour`): company site visits, office tours, industry treks, and trek info
+  sessions or sign-up deadlines.
 
 **Exclude** academic and logistics announcements, even when they carry a date and place:
 - Class sessions, pre-term or prep sessions, exam reviews, required team check-ins (e.g. Teams@Haas), bCourses items
@@ -153,7 +167,7 @@ If a newsletter item mixes both, keep only the part students choose to attend.
 ```
 Allowed values (the site's filters depend on these exact strings):
 - `source`: `bear-necessities` | `newsletter` (any other Haas/Berkeley email) | `campus-groups` | `haas-alumni` | `slack` | `bay-area` (public web)
-- `category`: `academic` | `career` | `club` | `speaker` | `networking` | `social` | `startup` | `conference` |
+- `category`: `academic` | `career` (workshops, skill-building) | `hiring` | `tour` | `club` | `speaker` | `networking` | `social` | `startup` | `conference` |
   `community` | `wellness` | `admin` (application deadlines for student opportunities only; never class or logistics items)
 - `audience`: `ewmba` | `haas` (all Haas programs) | `berkeley` (campus-wide) | `public`
 - `region`: `berkeley` (campus) | `east-bay` | `sf` | `peninsula` | `south-bay` | `north-bay` | `online`

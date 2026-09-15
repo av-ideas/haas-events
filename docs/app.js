@@ -23,7 +23,9 @@
   };
   const CATEGORIES = {
     academic: 'Academic',
-    career: 'Career & recruiting',
+    career: 'Career development',
+    hiring: 'Hiring & recruiting',
+    tour: 'Industry tours & treks',
     club: 'Clubs',
     speaker: 'Speakers & panels',
     networking: 'Networking',
