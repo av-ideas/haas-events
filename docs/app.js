@@ -59,10 +59,10 @@
   window.addEventListener('unhandledrejection', ev => noteError(`unhandled: ${ev.reason && (ev.reason.message || ev.reason)}`));
 
   const FACETS = [
+    { key: 'timing', label: 'When it happens', options: TIMINGS, get: e => e.timing, open: true },
     { key: 'source', label: 'Source', options: SOURCES, get: e => e.source, swatch: true, open: true },
     { key: 'category', label: 'Category', options: CATEGORIES, get: e => e.category, open: true },
     { key: 'audience', label: 'Who it’s for', options: AUDIENCES, get: e => e.audience },
-    { key: 'timing', label: 'When it happens', options: TIMINGS, get: e => e.timing, open: true },
     { key: 'region', label: 'Area', options: REGIONS, get: e => e.region },
     { key: 'format', label: 'Format', options: FORMATS, get: e => e.format },
   ];
